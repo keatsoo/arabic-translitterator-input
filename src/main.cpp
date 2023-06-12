@@ -1,34 +1,59 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
+
 #include "includes/fuzzySearch.hpp"
+#include "includes/transliterateNaively.hpp"
 
 using namespace std;
 
 string sentence{};
-vector<string> words{};
-map<string, string> dictionary{{"marhaban", "MAR7ABN"},
-                               {"ahlan", "AHLN"},
-                               {"fadaa'", "FAD.AA2"}};
+string corpusString{};
+string corpusLine{};
+vector<string> corpus{};
 
 int main(int argc, char *argv[]) {
-  getline(cin, sentence);
+  cout << "Loading the corpus...\n";
 
-  string s{};
-  for (int i = 0; i < (int)sentence.size(); i++) {
-    if (sentence[i] == ' ') {
-      words.push_back(s);
-      s = "";
-    } else {
-      s += sentence[i];
-    }
+  fstream corpusFile;
+  corpusFile.open("data/corpuses/quran-simple-plain.txt");
+
+  if (!corpusFile) {
+    cerr << "No such file!\n";
+    return 1;
   }
-  words.push_back(s);
 
-  cout << "closest word is : " << fuzzySearch(words[0], dictionary) << endl;
+  while (getline(corpusFile, corpusLine)) {
+    cout << corpusLine;
+    corpusString += corpusLine;
+  }
+
+  corpusFile.close();
+
+  string temp{};
+  for (char c : corpusString) {
+    if (c == ' ' || c == '\n') {
+      if (temp.size() >= 4) corpus.push_back(temp);
+      cout << "temp = " << temp << '\n';
+      temp = "";
+      continue;
+    }
+    temp += c;
+  }
+
+  cout << "Corpus loaded!\n"
+       << "Please enter a word to search : ";
+  cin >> sentence;
+
+  cout << "Searching " << sentence << "...\n";
+
+  string naiveTransliterated = transliterateNaively(sentence);
+  string closestFound = fuzzySearch(naiveTransliterated, corpus);
+
+  cout << "Closest word found is : " << closestFound << endl;
 
   return 0;
 }
-

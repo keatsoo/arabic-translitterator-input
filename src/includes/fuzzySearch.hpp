@@ -2,9 +2,9 @@
 #define FUZZYSEARCH_H
 
 #include <string>
-#include <map>
+#include <vector>
 #include "levensteinDistance.hpp"
 
-std::string fuzzySearch(const std::string &word, const std::map<std::string, std::string> words);
+std::string fuzzySearch(const std::string &word, std::vector<std::string> corpus);
 
 #endif

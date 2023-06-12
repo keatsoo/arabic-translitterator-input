@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 int levensteinDistance(const std::string &s1, const std::string &s2);
 
