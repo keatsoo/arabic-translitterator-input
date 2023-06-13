@@ -5,7 +5,7 @@
 #include "ArabicModel.hpp"
 
 ArabicModel::ArabicModel() {
-  latinToArabic["A"] = "ا";
+  latinToArabic["a"] = "ا";
   latinToArabic["b"] = "ب";
   latinToArabic["t"] = "ت";
   latinToArabic["th"] = "ث";
@@ -40,7 +40,7 @@ ArabicModel::ArabicModel() {
 
   latinToArabic["'"] = "ء";
   latinToArabic["2"] = "ء";
-  latinToArabic["a"] = "ى";
+  //latinToArabic["a"] = "ى";
   latinToArabic["2a"] = "آ";
   latinToArabic["2i"] = "ئ";
   latinToArabic["2u"] = "ؤ";
@@ -65,13 +65,15 @@ std::string ArabicModel::naiveTransliterate(const std::string &word) {
   std::string currentArabiziLetter{};
   std::vector<std::string> arabizis{};
 
-  for (int i = 0; i < word.size(); ++i) {
+  for (int i = 0; i < (int) word.size(); ++i) {
     std::string letter{word[i], word[i + 1]};
 
     if ((letter == "ah" || letter == "eh" || letter[1] == 'a' ||
          letter[1] == 'e') &&
-        (i == word.size() - 2)) {
+        (i == (int) (word.size() - 2))) {
       arabizis.push_back("tah marbutah");
+      ++i;
+      continue;
     }
 
     if (latinToArabic.find(letter) != latinToArabic.end()) {
@@ -100,7 +102,7 @@ float ArabicModel::jaroWinklerDistance(const std::string &word1,
   float l1 = (float)word1.size();
   float l2 = (float)word2.size();
 
-  if (l1 == l2 == 0) return 1.0f;
+  if (l1 == 0 && l2 == 0) return 1.0f;
 
   int maxRange = (int)(std::max(l1, l2) / 2) - 1;
 
@@ -164,10 +166,10 @@ std::unordered_map<std::string, float> ArabicModel::findSuggestions(
 
   std::unordered_map<std::string, float> candidates{};
 
-  for (const std::string candidate : wordCorpus) {
+  for (const std::string &candidate : wordCorpus) {
     float jwSimilarityCandidate = jaroWinklerDistance(candidate, naiveTransliterated);
 
-    std::cerr << "Distance between " << candidate << " & " << naiveTransliterated << " is " << jwSimilarityCandidate << "\n";
+    if (jwSimilarityCandidate > 0) std::cerr << "Distance between " << candidate << " & " << naiveTransliterated << " is " << jwSimilarityCandidate << "\n";
 
     if (jwSimilarityCandidate > 1.0f)
       throw std::range_error("Jaro-Winkler Distance is over 1!");
@@ -180,7 +182,7 @@ std::unordered_map<std::string, float> ArabicModel::findSuggestions(
       float minFloat = 2.0f;
       std::string minKey{};
 
-      for (const std::pair<std::string, float> &candPair : candidates) {
+      for (const std::pair<const std::string, float> &candPair : candidates) {
         if (candPair.second < minFloat) {
           minFloat = candPair.second;
           minKey = candPair.first;
@@ -197,7 +199,7 @@ std::unordered_map<std::string, float> ArabicModel::findSuggestions(
       float minFloat = 2.0f;
       std::string minKey{};
 
-      for (const std::pair<std::string, float> &candPair : candidates) {
+      for (const std::pair<const std::string, float> &candPair : candidates) {
         if (candPair.second < minFloat) {
           minFloat = candPair.second;
           minKey = candPair.first;

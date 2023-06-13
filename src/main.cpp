@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
   file.open("./data/corpuses/chat-gpt-sample-poem.txt");
 
   while (file >> noskipws >> corpusChar) {
-    if (tempCorpus == " " || tempCorpus == "\n") {
+    if (corpusChar == ' ' || corpusChar == '\n') {
       corpus.push_back(tempCorpus);
       tempCorpus.clear();
       continue;
@@ -42,15 +42,15 @@ int main(int argc, char *argv[])
   unordered_map<string, float> candidates = model.findSuggestions(sentence);
 
   vector<pair<string, float>> vec{};
-  for (const pair<string, float> &pair : candidates) {
-    vec.push_back(pair);
+  for (const pair<const string, float> &myPair : candidates) {
+    vec.push_back(myPair);
   }
 
   sort(vec.begin(), vec.end(), [](const pair<string, float> &a, const pair<string, float> &b){
         return a.second > b.second;
   });
 
-  for (int i = 0; i < vec.size(); ++i) {
+  for (int i = 0; i < (int) vec.size(); ++i) {
     cout << i + 1 << ". " << vec[i].first << "\n";
   }
 
