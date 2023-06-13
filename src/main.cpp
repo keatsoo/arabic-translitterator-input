@@ -1,59 +1,58 @@
-#include <algorithm>
-#include <fstream>
 #include <iostream>
-#include <map>
+#include <fstream>
 #include <string>
 #include <vector>
-
-#include "includes/fuzzySearch.hpp"
-#include "includes/transliterateNaively.hpp"
+#include "ArabicModelCore/ArabicModel.hpp"
 
 using namespace std;
 
 string sentence{};
-string corpusString{};
-string corpusLine{};
+string tempCorpus{};
 vector<string> corpus{};
+char corpusChar{};
 
-int main(int argc, char *argv[]) {
-  cout << "Loading the corpus...\n";
+ArabicModel model{};
 
-  fstream corpusFile;
-  corpusFile.open("data/corpuses/quran-simple-plain.txt");
-
-  if (!corpusFile) {
-    cerr << "No such file!\n";
-    return 1;
+int main(int argc, char *argv[])
+{
+  if (argc == 2) sentence = argv[1];
+  else {
+    cout << "Enter the word to search: ";
+    cin >> sentence;
   }
 
-  while (getline(corpusFile, corpusLine)) {
-    cout << corpusLine;
-    corpusString += corpusLine;
-  }
+  ifstream file;
+  file.open("./data/corpuses/chat-gpt-sample-poem.txt");
 
-  corpusFile.close();
-
-  string temp{};
-  for (char c : corpusString) {
-    if (c == ' ' || c == '\n') {
-      if (temp.size() >= 4) corpus.push_back(temp);
-      cout << "temp = " << temp << '\n';
-      temp = "";
+  while (file >> noskipws >> corpusChar) {
+    if (tempCorpus == " " || tempCorpus == "\n") {
+      corpus.push_back(tempCorpus);
+      tempCorpus.clear();
       continue;
     }
-    temp += c;
+    tempCorpus += corpusChar;
   }
 
-  cout << "Corpus loaded!\n"
-       << "Please enter a word to search : ";
-  cin >> sentence;
+  file.close();
 
-  cout << "Searching " << sentence << "...\n";
+  for (string word : corpus) {
+    model.addWord(word);
+  }
 
-  string naiveTransliterated = transliterateNaively(sentence);
-  string closestFound = fuzzySearch(naiveTransliterated, corpus);
+  unordered_map<string, float> candidates = model.findSuggestions(sentence);
 
-  cout << "Closest word found is : " << closestFound << endl;
+  vector<pair<string, float>> vec{};
+  for (const pair<string, float> &pair : candidates) {
+    vec.push_back(pair);
+  }
 
-  return 0;
+  sort(vec.begin(), vec.end(), [](const pair<string, float> &a, const pair<string, float> &b){
+        return a.second > b.second;
+  });
+
+  for (int i = 0; i < vec.size(); ++i) {
+    cout << i + 1 << ". " << vec[i].first << "\n";
+  }
+
+  return EXIT_SUCCESS;
 }
