@@ -7,7 +7,7 @@ This is an input method that works like Google IME or Yamli, but in a more moder
 - [x] Create the Arabic Model class
 - [ ] Get textual corpora (right now it's only a poem bade by ChatGPT)
 - [ ] Normalize corpora
-- [ ] Create a method to load corpora from a file
+- [x] Create a function to load corpora from a file
 - [x] Get input
 - [ ] Check input type
 - [x] Naively transliterate (I need to make it better)
