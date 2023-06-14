@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <regex>
 
 #include "ArabicModel.hpp"
 
@@ -49,12 +48,13 @@ ArabicModel::ArabicModel() {
 }
 
 void ArabicModel::addWord(const std::string &word) {
-  if (std::find(wordCorpus.begin(), wordCorpus.end(), word) == wordCorpus.end())
-    wordCorpus.push_back(word);
+  std::string m_word = stripWord(word);
+  if (wordCorpus.find(m_word) == wordCorpus.end())
+    wordCorpus.insert({m_word, stemWord(m_word)});
 }
 
 bool ArabicModel::isWord(const std::string &word) {
-  return std::find(wordCorpus.begin(), wordCorpus.end(), word) !=
+  return wordCorpus.find(word) !=
          wordCorpus.end();
 }
 
@@ -126,79 +126,37 @@ int ArabicModel::levensteinDistance(const std::string &s1,
   return d[l1][l2];
 }
 
-float ArabicModel::jaroWinklerDistance(const std::string &word1,
-                                       const std::string &word2) {
-  float l1 = (float)word1.size();
-  float l2 = (float)word2.size();
-
-  if (l1 == 0 && l2 == 0) return 1.0f;
-
-  int maxRange = (int)(std::max(l1, l2) / 2) - 1;
-
-  std::vector<bool> match1(l1, false);
-  std::vector<bool> match2(l2, false);
-
-  float matches = 0;
-
-  for (int i = 0; i < l1 - 1; ++i) {
-    int start = std::max(0, i - maxRange);
-    int end = std::min((int)(i + maxRange), (int)(l2 - 1));
-
-    for (int j = start; j < end; ++j) {
-      if (!match2[j] && word1[1] == word2[j]) {
-        match1[i] = true;
-        match2[i] = true;
-        matches++;
-        break;
-      }
-    }
-  }
-
-  if (matches == 0) return 0.0f;
-
-  int transpositions = 0;
-  int k = 0;
-
-  for (int i = 0; i < l1; ++i) {
-    if (match1[i]) {
-      while (!match2[k]) ++k;
-
-      if (word1[i] != word2[k]) ++transpositions;
-
-      k++;
-    }
-  }
-
-  float jaroSimilarity = (matches / l1 + matches / l2 +
-                          (matches - transpositions / 2.0f) / matches) /
-                         3.0f;
-
-  float prefixLength = 0;
-  float maxPrefixLength = std::min(4.0f, std::min(l1, l2));
-
-  for (int i = 0; i < maxPrefixLength; ++i) {
-    if (word1[i] != word2[i]) break;
-    ++prefixLength;
-  }
-
-  float jaroWinklerSimilarity =
-      jaroSimilarity + prefixLength * 0.1 * (1 - jaroSimilarity);
-
-  return jaroWinklerSimilarity;
-}
-
 std::unordered_map<std::string, float> ArabicModel::findSuggestions(
     const std::string &word) {
   std::string naiveTransliterated = naiveTransliterate(word);
-
   std::cerr << "Naive Transliteration : " << naiveTransliterated << "\n";
 
-  std::unordered_map<std::string, float> candidates{};
+  std::string stemmed = stemWord(naiveTransliterated);
+  std::cerr << "Searching for root " << stemmed << "\n";
 
-  for (const std::string &candidate : wordCorpus) {
+  std::unordered_map<std::string, float> candidates{};
+  std::vector<std::string> candidatesAfterComparingStems{};
+
+  for (const std::pair<const std::string, std::string> &corpusWordPair : wordCorpus) {
+    std::string stemmedCorpus = corpusWordPair.second;
+    if (levensteinDistance(stemmedCorpus, stemmed) < 3) {
+      candidatesAfterComparingStems.push_back(corpusWordPair.first);
+    }
+  }
+
+  for (const std::pair<const std::string, std::string> &candidatePair : wordCorpus) {
+    std::string candidate = candidatePair.first;
     // float jwSimilarityCandidate =
     //    jaroWinklerDistance(candidate, naiveTransliterated);
-    float levensteinSimilarityScore = levensteinDistance(candidate, naiveTransliterated);
+    float levensteinSimilarityScore =
+        levensteinDistance(candidate, naiveTransliterated);
+
+    float stemFactor =
+        std::find(candidatesAfterComparingStems.begin(),
+                  candidatesAfterComparingStems.end(),
+                  candidate) != candidatesAfterComparingStems.end()
+            ? 2.0f
+            : 1;
 
     if (levensteinSimilarityScore < 4)
       std::cerr << "Distance between " << candidate << " & "
@@ -222,15 +180,79 @@ std::unordered_map<std::string, float> ArabicModel::findSuggestions(
 
       if (levensteinSimilarityScore < maxFloat) {
         candidates.erase(maxKey);
-        candidates[candidate] = levensteinSimilarityScore;
+        candidates[candidate] = levensteinSimilarityScore / stemFactor;
       }
     }
-
   }
- 
+
   return candidates;
 }
 
-std::string stripWord(const std::string &word) {
-  return std::regex_replace(word, std::regex(". ,!?;:"), "");
+std::string ArabicModel::stripWord(const std::string &word) {
+  return std::regex_replace(word, std::regex("[[:punct:]]"), "");
+}
+
+std::string ArabicModel::stemWord(const std::string &word) {
+  std::string output =
+      std::regex_replace(word, std::regex("[\\u064B-\\u0652\\u0670\\u0629]"), "");
+
+  //std::cout << "output rn is " << output << "\n";
+
+  if (output.length() <= std::string("ااا").length()) {
+    return output;
+  }
+
+  std::vector<std::pair<std::regex, std::string>> patterns = {
+      // Prefixes
+      {std::regex("^ال"), ""},  // Al-
+      {std::regex("^و"), ""},   // Wa-
+      {std::regex("^ب"), ""},   // Bi-
+      {std::regex("^ف"), ""},   // Fa-
+      {std::regex("^ل"), ""},   // Li-
+      {std::regex("^ك"), ""},   // Ka-
+      {std::regex("^م"), ""},   // Ma-
+      {std::regex("^ن"), ""},   // Na-
+      {std::regex("^س"), ""},   // Sa-
+      {std::regex("^ي"), ""},   // Ya-
+      {std::regex("^ت"), ""},   // Ta-
+      {std::regex("^أ"), ""},   // Alef with Hamza above
+      {std::regex("^إ"), ""},   // Alef with Hamza below
+      {std::regex("^آ"), ""},   // Alef with Madda above
+
+      // Suffixes
+      {std::regex("ات$"), ""},   // Feminine plural
+      {std::regex("اتي$"), ""},  // My feminine plural
+      {std::regex("ان$"), ""},   // Dual
+      {std::regex("ون$"), ""},   // Masculine plural
+      {std::regex("ين$"), ""},   // Masculine plural
+      {std::regex("ة$"), ""},    // Feminine singular
+      {std::regex("ها$"), ""},   // Her
+      {std::regex("ه$"), ""},    // Her
+      {std::regex("نا$"), ""},   // Us
+      {std::regex("ي$"), ""},    // My
+      {std::regex("ى$"), ""},    // My
+      {std::regex("يا$"), ""},   // O
+      {std::regex("ا$"), ""},    // Alef
+      {std::regex("تما$"), ""},  // Both of them
+      {std::regex("تم$"), ""},   // Both
+      {std::regex("تن$"), ""},   // Their
+      {std::regex("وا$"), ""},    // They
+      
+      {std::regex("([اوي])\\1"), "$1"}
+  };
+
+  for (std::pair<std::regex, std::string> &pair : patterns) {
+    output = std::regex_replace(output, pair.first, pair.second);
+
+    //std::cout << "New output for " << word << " is " << output << ", \n";
+
+    if (output.length() <= std::string("ااا").length()) {
+      // std::cout << "Word's " << word << " stem is " << output << "\n";
+      return output;
+    }
+  }
+
+  //std::cout << "Couldn't stem correctly, so output for " << word << " is "
+  //          << output << "\n";
+  return output;
 }
