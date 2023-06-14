@@ -1,39 +1,30 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
+
 #include "ArabicModelCore/ArabicModel.hpp"
 
 using namespace std;
 
 string sentence{};
-string tempCorpus{};
 vector<string> corpus{};
-char corpusChar{};
 
 ArabicModel model{};
 
-int main(int argc, char *argv[])
-{
-  if (argc == 2) sentence = argv[1];
+vector<string> loadCorpus(const vector<string> &files);
+
+int main(int argc, char *argv[]) {
+  if (argc == 2)
+    sentence = argv[1];
   else {
     cout << "Enter the word to search: ";
     cin >> sentence;
   }
 
-  ifstream file;
-  file.open("./data/corpuses/chat-gpt-sample-poem.txt");
+  vector<string> filenames {"./data/corpuses/chat-gpt-sample-poem.txt"};
 
-  while (file >> noskipws >> corpusChar) {
-    if (corpusChar == ' ' || corpusChar == '\n') {
-      corpus.push_back(tempCorpus);
-      tempCorpus.clear();
-      continue;
-    }
-    tempCorpus += corpusChar;
-  }
-
-  file.close();
+  corpus = loadCorpus(filenames);
 
   for (string word : corpus) {
     model.addWord(word);
@@ -46,13 +37,39 @@ int main(int argc, char *argv[])
     vec.push_back(myPair);
   }
 
-  sort(vec.begin(), vec.end(), [](const pair<string, float> &a, const pair<string, float> &b){
-        return a.second < b.second;
-  });
+  sort(vec.begin(), vec.end(),
+       [](const pair<string, float> &a, const pair<string, float> &b) {
+         return a.second < b.second;
+       });
 
-  for (int i = 0; i < (int) vec.size(); ++i) {
+  for (int i = 0; i < (int)vec.size(); ++i) {
     cout << i + 1 << ". " << vec[i].first << " (" << vec[i].second << ")\n";
   }
 
   return EXIT_SUCCESS;
+}
+
+vector<string> loadCorpus(const vector<string> &files) {
+  string tempCorpus{};
+  char corpusChar{};
+
+  vector<string> outWords{};
+
+  ifstream file;
+  for (string fileName : files) {
+    file.open(fileName);
+
+    while (file >> noskipws >> corpusChar) {
+      if (corpusChar == ' ' || corpusChar == '\n') {
+        outWords.push_back(tempCorpus);
+        tempCorpus.clear();
+        continue;
+      }
+      tempCorpus += corpusChar;
+    }
+
+    file.close();
+  }
+
+  return outWords;
 }
