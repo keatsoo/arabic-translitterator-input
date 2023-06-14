@@ -13,7 +13,6 @@ public:
     ArabicModel();
 
     void addWord(const std::string &word);
-    bool isWord(const std::string &word);
     std::unordered_map<std::string, float> findSuggestions(const std::string &word);
 
 private:
@@ -23,7 +22,6 @@ private:
 
     int levensteinDistance(const std::string &s1, const std::string &s2);
     std::string naiveTransliterate(const std::string &word);
-    bool lettersEqual(const std::wstring &a, const std::wstring &b);
     std::string stripWord(const std::string &word);
     std::string stemWord(const std::string &word);
 };

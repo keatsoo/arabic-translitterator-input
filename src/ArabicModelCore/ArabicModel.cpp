@@ -53,16 +53,6 @@ void ArabicModel::addWord(const std::string &word) {
     wordCorpus.insert({m_word, stemWord(m_word)});
 }
 
-bool ArabicModel::isWord(const std::string &word) {
-  return wordCorpus.find(word) !=
-         wordCorpus.end();
-}
-
-bool ArabicModel::lettersEqual(const std::wstring &a, const std::wstring &b) {
-  return a == b;  // PLACEHOLDER: make it will return if the letters are
-                  // similar or not but for now they'll have to be equal
-}
-
 std::string ArabicModel::naiveTransliterate(const std::string &word) {
   std::string arabicWord{};
   std::string currentArabiziLetter{};
