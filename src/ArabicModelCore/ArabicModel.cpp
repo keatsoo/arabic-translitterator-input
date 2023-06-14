@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <regex>
 
 #include "ArabicModel.hpp"
 
@@ -40,7 +41,7 @@ ArabicModel::ArabicModel() {
 
   latinToArabic["'"] = "ء";
   latinToArabic["2"] = "ء";
-  //latinToArabic["a"] = "ى";
+  // latinToArabic["a"] = "ى";
   latinToArabic["2a"] = "آ";
   latinToArabic["2i"] = "ئ";
   latinToArabic["2u"] = "ؤ";
@@ -48,11 +49,13 @@ ArabicModel::ArabicModel() {
 }
 
 void ArabicModel::addWord(const std::string &word) {
-  if (std::find(wordCorpus.begin(), wordCorpus.end(), word) == wordCorpus.end()) wordCorpus.push_back(word); 
+  if (std::find(wordCorpus.begin(), wordCorpus.end(), word) == wordCorpus.end())
+    wordCorpus.push_back(word);
 }
 
 bool ArabicModel::isWord(const std::string &word) {
-  return std::find(wordCorpus.begin(), wordCorpus.end(), word) != wordCorpus.end();
+  return std::find(wordCorpus.begin(), wordCorpus.end(), word) !=
+         wordCorpus.end();
 }
 
 bool ArabicModel::lettersEqual(const std::wstring &a, const std::wstring &b) {
@@ -65,12 +68,12 @@ std::string ArabicModel::naiveTransliterate(const std::string &word) {
   std::string currentArabiziLetter{};
   std::vector<std::string> arabizis{};
 
-  for (int i = 0; i < (int) word.size(); ++i) {
+  for (int i = 0; i < (int)word.size(); ++i) {
     std::string letter{word[i], word[i + 1]};
 
     if ((letter == "ah" || letter == "eh" || letter[1] == 'a' ||
          letter[1] == 'e') &&
-        (i == (int) (word.size() - 2))) {
+        (i == (int)(word.size() - 2))) {
       arabizis.push_back("tah marbutah");
       ++i;
       continue;
@@ -95,6 +98,32 @@ std::string ArabicModel::naiveTransliterate(const std::string &word) {
   }
 
   return arabicWord;
+}
+
+int ArabicModel::levensteinDistance(const std::string &s1,
+                                    const std::string &s2) {
+  int l1 = (int)s1.length();
+  int l2 = (int)s2.length();
+
+  std::vector<std::vector<int>> d(l1 + 1, std::vector<int>(l2 + 1, 0));
+
+  for (int i = 0; i <= l1; ++i) d[i][0] = i;
+  for (int j = 0; j <= l2; ++j) d[0][j] = j;
+
+  for (int x = 1; x <= l1; ++x) {
+    for (int y = 1; y <= l2; ++y) {
+      if (s1[x - 1] == s2[y - 1]) {
+        d[x][y] = d[x - 1][y - 1];
+      } else {
+        int supp = d[x - 1][y] + 1;
+        int inse = d[x][y - 1] + 1;
+        int subs = d[x - 1][y - 1] + 1;
+        d[x][y] = std::min({supp, inse, subs});
+      }
+    }
+  }
+
+  return d[l1][l2];
 }
 
 float ArabicModel::jaroWinklerDistance(const std::string &word1,
@@ -167,50 +196,41 @@ std::unordered_map<std::string, float> ArabicModel::findSuggestions(
   std::unordered_map<std::string, float> candidates{};
 
   for (const std::string &candidate : wordCorpus) {
-    float jwSimilarityCandidate = jaroWinklerDistance(candidate, naiveTransliterated);
+    // float jwSimilarityCandidate =
+    //    jaroWinklerDistance(candidate, naiveTransliterated);
+    float levensteinSimilarityScore = levensteinDistance(candidate, naiveTransliterated);
 
-    if (jwSimilarityCandidate > 0) std::cerr << "Distance between " << candidate << " & " << naiveTransliterated << " is " << jwSimilarityCandidate << "\n";
-
-    if (jwSimilarityCandidate > 1.0f)
-      throw std::range_error("Jaro-Winkler Distance is over 1!");
+    if (levensteinSimilarityScore < 4)
+      std::cerr << "Distance between " << candidate << " & "
+                << naiveTransliterated << " is " << levensteinSimilarityScore
+                << "\n";
 
     if ((int)candidates.size() < 3) {
-      candidates.insert({candidate, jwSimilarityCandidate});
+      candidates.insert({candidate, levensteinSimilarityScore});
     }
 
     if ((int)candidates.size() == 3) {
-      float minFloat = 2.0f;
-      std::string minKey{};
+      float maxFloat = 0.0f;
+      std::string maxKey;
 
       for (const std::pair<const std::string, float> &candPair : candidates) {
-        if (candPair.second < minFloat) {
-          minFloat = candPair.second;
-          minKey = candPair.first;
+        if (candPair.second > maxFloat) {
+          maxFloat = candPair.second;
+          maxKey = candPair.first;
         }
       }
 
-      if (minFloat <= jwSimilarityCandidate) {
-        candidates[candidate] = jwSimilarityCandidate;
+      if (levensteinSimilarityScore < maxFloat) {
+        candidates.erase(maxKey);
+        candidates[candidate] = levensteinSimilarityScore;
       }
     }
 
-    if ((int)candidates.size() > 3) {
-
-      float minFloat = 2.0f;
-      std::string minKey{};
-
-      for (const std::pair<const std::string, float> &candPair : candidates) {
-        if (candPair.second < minFloat) {
-          minFloat = candPair.second;
-          minKey = candPair.first;
-        }
-      }
-
-      candidates.erase(minKey);
-
-    }
   }
-
-
+ 
   return candidates;
+}
+
+std::string stripWord(const std::string &word) {
+  return std::regex_replace(word, std::regex(". ,!?;:"), "");
 }

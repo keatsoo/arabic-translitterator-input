@@ -47,11 +47,11 @@ int main(int argc, char *argv[])
   }
 
   sort(vec.begin(), vec.end(), [](const pair<string, float> &a, const pair<string, float> &b){
-        return a.second > b.second;
+        return a.second < b.second;
   });
 
   for (int i = 0; i < (int) vec.size(); ++i) {
-    cout << i + 1 << ". " << vec[i].first << "\n";
+    cout << i + 1 << ". " << vec[i].first << " (" << vec[i].second << ")\n";
   }
 
   return EXIT_SUCCESS;
