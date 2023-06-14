@@ -116,13 +116,35 @@ int ArabicModel::levensteinDistance(const std::string &s1,
   return d[l1][l2];
 }
 
+ArabicModel::textType ArabicModel::checkType (const std::string &word) {
+  if (std::regex_match(word, std::regex("[0-9]+"))) return textType::DIGITS_ONLY;
+  if (std::regex_match(word, std::regex("[\\u0600-\\u06FF]+"))) return textType::ARABIC_ONLY;
+  if (std::regex_match(word, std::regex("[[:punct:]]+"))) return textType::PUNCTUATION_ONLY;
+
+  return textType::ARABIZI_ONLY;
+}
+
+std::unordered_map<std::string, float> convertDigits(const std::string &word) {
+  std::string output{};
+  for (char c : word) {
+    if (c >= '0' && c <= '9') {
+      output.push_back(c - '0' + 0x0600);
+    }
+  }
+  std::unordered_map<std::string, float> outMap{{output, 0.0}};
+  return outMap;
+}
+
 std::unordered_map<std::string, float> ArabicModel::findSuggestions(
     const std::string &word) {
+
+  textType wordType = checkType(word);
+
+  if (wordType == textType::DIGITS_ONLY) return convertDigits(word);
+
   std::string naiveTransliterated = naiveTransliterate(word);
-  std::cerr << "Naive Transliteration : " << naiveTransliterated << "\n";
 
   std::string stemmed = stemWord(naiveTransliterated);
-  std::cerr << "Searching for root " << stemmed << "\n";
 
   std::unordered_map<std::string, float> candidates{};
   std::vector<std::string> candidatesAfterComparingStems{};
@@ -136,8 +158,6 @@ std::unordered_map<std::string, float> ArabicModel::findSuggestions(
 
   for (const std::pair<const std::string, std::string> &candidatePair : wordCorpus) {
     std::string candidate = candidatePair.first;
-    // float jwSimilarityCandidate =
-    //    jaroWinklerDistance(candidate, naiveTransliterated);
     float levensteinSimilarityScore =
         levensteinDistance(candidate, naiveTransliterated);
 
@@ -186,8 +206,6 @@ std::string ArabicModel::stemWord(const std::string &word) {
   std::string output =
       std::regex_replace(word, std::regex("[\\u064B-\\u0652\\u0670\\u0629]"), "");
 
-  //std::cout << "output rn is " << output << "\n";
-
   if (output.length() <= std::string("ااا").length()) {
     return output;
   }
@@ -234,15 +252,10 @@ std::string ArabicModel::stemWord(const std::string &word) {
   for (std::pair<std::regex, std::string> &pair : patterns) {
     output = std::regex_replace(output, pair.first, pair.second);
 
-    //std::cout << "New output for " << word << " is " << output << ", \n";
-
     if (output.length() <= std::string("ااا").length()) {
-      // std::cout << "Word's " << word << " stem is " << output << "\n";
       return output;
     }
   }
 
-  //std::cout << "Couldn't stem correctly, so output for " << word << " is "
-  //          << output << "\n";
   return output;
 }
