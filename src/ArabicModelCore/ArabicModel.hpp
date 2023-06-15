@@ -19,7 +19,8 @@ public:
       ARABIC_ONLY,
       ARABIZI_ONLY,
       PUNCTUATION_ONLY,
-      DIGITS_ONLY
+      DIGITS_ONLY,
+      OTHER
     };
 
 private:

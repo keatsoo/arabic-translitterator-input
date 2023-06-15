@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     cin >> sentence;
   }
 
-  vector<string> filenames {"./data/corpuses/chat-gpt-sample-poem.txt"};
+  vector<string> filenames{"./data/corpuses/chat-gpt-sample-poem.txt"};
 
   corpus = loadCorpus(filenames);
 

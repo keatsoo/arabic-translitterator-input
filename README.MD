@@ -9,7 +9,7 @@ This is an input method that works like Google IME or Yamli, but in a more moder
 - [ ] Normalize corpora
 - [x] Create a function to load corpora from a file
 - [x] Get input
-- [ ] Check input type
+- [x] Check input type
 - [x] Naively transliterate (I need to make it better)
 - [x] Stem (I created a very rudimentary stemmer, I need to make it better)
 - [x] Fuzzy search in the corpora, prioritizing the words with same stem

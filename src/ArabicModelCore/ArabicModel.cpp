@@ -138,17 +138,20 @@ std::unordered_map<std::string, float> convertDigits(const std::string &word) {
 std::unordered_map<std::string, float> ArabicModel::findSuggestions(
     const std::string &word) {
 
+  std::unordered_map<std::string, float> candidates{};
+  std::vector<std::string> candidatesAfterComparingStems{};
+
   textType wordType = checkType(word);
 
   if (wordType == textType::DIGITS_ONLY) return convertDigits(word);
+  if (wordType == textType::PUNCTUATION_ONLY || wordType == textType::ARABIC_ONLY) { candidates[word] = 0.0f; return candidates; }
+  
 
   std::string naiveTransliterated = naiveTransliterate(word);
 
   std::string stemmed = stemWord(naiveTransliterated);
 
-  std::unordered_map<std::string, float> candidates{};
-  std::vector<std::string> candidatesAfterComparingStems{};
-
+  
   for (const std::pair<const std::string, std::string> &corpusWordPair : wordCorpus) {
     std::string stemmedCorpus = corpusWordPair.second;
     if (levensteinDistance(stemmedCorpus, stemmed) < 3) {
