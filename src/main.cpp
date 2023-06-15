@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "ArabicModelCore/ArabicModel.hpp"
+#include "AlifKeyCore/ArabicModel.hpp"
 
 using namespace std;
 
