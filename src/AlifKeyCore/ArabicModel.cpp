@@ -124,7 +124,7 @@ ArabicModel::textType ArabicModel::checkType (const std::string &word) {
   return textType::ARABIZI_ONLY;
 }
 
-std::unordered_map<std::string, float> convertDigits(const std::string &word) {
+std::unordered_map<std::string, float> ArabicModel::convertDigits(const std::string &word) {
   std::string output{};
   for (char c : word) {
     if (c >= '0' && c <= '9') {
