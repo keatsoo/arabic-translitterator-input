@@ -1,5 +1,6 @@
-# Arabic Translitterator Input
-This is an input method that works like Google IME or Yamli, but in a more modern and personalized way.
+# AlifKey
+## Arabic Translitterator Input
+AlifKey is an input method that works like Google IME or Yamli, but in a more modern and personalized way. Also it works on Linux so thats cool I guess.
 
 ## TODO:
 
