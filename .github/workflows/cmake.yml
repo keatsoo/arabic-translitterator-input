@@ -21,23 +21,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Install build dependencies
-      run: sudo apt-get update && sudo apt-get install -y build-essential ninja-build
-
-    - name: Install Meson
-      run: sudo apt-get install -y python3-pip && pip3 install --user meson
-
-    - name: Install Gtkmm dependencies
-      run: sudo apt-get install -y libglibmm-2.4-dev libgtk-3-dev libgtkmm-3.0-dev gobject-introspection libgirepository1.0-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev libunwind-dev
-
-    - name: Build and install Gtkmm 4.0
-      run: |
-        wget https://download.gnome.org/sources/gtkmm/4.10/gtkmm-4.10.0.tar.xz
-        tar -xf gtkmm-4.10.0.tar.xz
-        cd gtkmm-4.10.0
-        meson _build --prefix=/usr
-        cd _build
-        ninja
-        sudo ninja install
+      run: sudo apt-get update && sudo apt-get install -y libgtkmm-4.0-dev
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
