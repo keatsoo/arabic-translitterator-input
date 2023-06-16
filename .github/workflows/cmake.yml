@@ -31,9 +31,9 @@ jobs:
 
     - name: Build and install Gtkmm 4.0
       run: |
-        wget https://download.gnome.org/sources/gtkmm/4.0/gtkmm-4.2.0.tar.xz
-        tar -xf gtkmm-4.2.0.tar.xz
-        cd gtkmm-4.2.0
+        wget https://download.gnome.org/sources/gtkmm/4.10/gtkmm-4.10.0.tar.xz
+        tar -xf gtkmm-4.10.0.tar.xz
+        cd gtkmm-4.10.0
         meson _build --prefix=/usr
         cd _build
         ninja
