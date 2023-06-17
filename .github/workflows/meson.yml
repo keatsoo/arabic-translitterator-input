@@ -35,7 +35,7 @@ jobs:
         cd ../..
 
         wget https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.0.tar.xz
-        tar xf glibmm-2.68.0
+        tar xf glibmm-2.68.0.tar.gz
         meson --libdir lib my_build .
         cd my_build
         ninja
@@ -51,7 +51,7 @@ jobs:
         cd ../..
 
         wget https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz
-        tar xf pangomm-2.50.0/
+        tar xf pangomm-2.50.0.tar.xz
         cd pangomm-2.50.o/
         meson --libdir lib my_build .
         cd my_build
