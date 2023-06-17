@@ -17,7 +17,21 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Installing Meson and Ninja
-      run: sudo apt update && sudo apt install python3-pip ninja-build && pip3 install --user meson
+      run: sudo apt update && sudo apt install -y python3-pip ninja-build && pip3 install --user meson
+
+    - name: Installing GTKmm dependencies
+      run: sudo apt install -y sigc++-3.0 gtk4 glibmm-2.68 cairomm-1.16 pangomm-2.48 pkg-config glib-2.0 pango cairo gdk-pixbuf-2.0 graphene-1.0 build-dep build-essential
+    
+    - name: Setting up GTKmm
+      run: |
+        wget https://download.gnome.org/sources/gtkmm/4.10/gtkmm-4.10.0.tar.xz
+        tar xf gtkmm-4.10.0.tar.xz
+        cd gtkmm-4.10.0
+        meson setup --libdir lib my_build .
+        cd my_build/
+        ninja
+        ninja install
+        cd ../../
 
     - name: Build
       run: meson build && cd build && ninja
