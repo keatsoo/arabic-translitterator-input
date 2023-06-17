@@ -20,7 +20,7 @@ jobs:
       run: sudo apt update && sudo apt install -y python3-pip ninja-build && pip3 install --user meson
 
     - name: Installing GTKmm dependencies
-      run: sudo apt-get install -y libxkbcommon-dev
+      run: sudo apt-get install -y libxkbcommon-dev libwayland-dev
     
     - name: Setting up GTKmm
       run: |
