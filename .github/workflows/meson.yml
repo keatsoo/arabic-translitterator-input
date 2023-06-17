@@ -42,7 +42,6 @@ jobs:
         ninja
         sudo ninja install
         cd ../..
-        pkg-config --list-all | grep glibmm
 
         wget https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz
         tar xf cairomm-1.16.2.tar.xz
@@ -56,6 +55,24 @@ jobs:
         wget https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz
         tar xf pangomm-2.50.0.tar.xz
         cd pangomm-2.50.0/
+        meson --libdir lib --prefix=/usr my_build .
+        cd my_build
+        ninja
+        sudo ninja install
+        cd ../..
+
+        wget https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.10.tar.xz
+        tar xf gdk-pixbuf-2.42.10.tar.xz
+        cd gdk-pixbuf-2.42.10/
+        meson --libdir lib --prefix=/usr my_build .
+        cd my_build
+        ninja
+        sudo ninja install
+        cd ../..
+
+        wget https://download.gnome.org/sources/graphene/1.10/graphene-1.10.8.tar.xz
+        tar xf graphene-1.10.8.tar.xz
+        cd graphene-1.10.8/
         meson --libdir lib --prefix=/usr my_build .
         cd my_build
         ninja
