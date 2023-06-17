@@ -36,6 +36,7 @@ jobs:
 
         wget https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.2.tar.xz
         tar xf glibmm-2.68.2.tar.xz
+        cd glibmm-2.68.2
         meson --libdir lib --prefix=/usr my_build .
         cd my_build
         ninja
