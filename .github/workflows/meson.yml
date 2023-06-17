@@ -1,0 +1,23 @@
+name: Meson and Ninja
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Installing Meson and Ninja
+      run: sudo apt update && sudo apt install python3-pip ninja-build && pip3 install --user meson
+
+    - name: Build
+      run: meson build && cd build && ninja
