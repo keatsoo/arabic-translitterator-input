@@ -42,8 +42,9 @@ jobs:
         sudo ninja install
         cd ../..
 
-        git clone https://github.com/freedesktop/cairomm.git
-        cd cairomm
+        wget https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz
+        tar xf cairomm-1.16.2.tar.xz
+        cd cairomm-1.16.2
         meson --libdir lib my_build .
         cd my_build
         ninja
