@@ -48,7 +48,7 @@ jobs:
         meson --libdir lib --prefix=/usr my_build .
         cd my_build
         ninja
-        ninja install
+        sudo ninja install
         cd ../..
 
         wget https://download.gnome.org/sources/pangomm/2.48/pangomm-2.48.0.tar.xz
@@ -57,7 +57,7 @@ jobs:
         meson --libdir lib --prefix=/usr my_build .
         cd my_build
         ninja
-        ninja install
+        sudo ninja install
         cd ../..
     
     - name: Setting up GTKmm
@@ -68,7 +68,7 @@ jobs:
         meson setup --libdir lib my_build .
         cd my_build/
         ninja
-        ninja install
+        sudo ninja install
         cd ../../
 
     - name: Build
