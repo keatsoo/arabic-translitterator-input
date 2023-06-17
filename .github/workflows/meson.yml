@@ -39,7 +39,7 @@ jobs:
         meson --libdir lib my_build .
         cd my_build
         ninja
-        sudo ninja install
+        ninja install
         cd ../..
 
         wget https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz
