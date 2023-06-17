@@ -20,7 +20,44 @@ jobs:
       run: sudo apt update && sudo apt install -y python3-pip ninja-build && pip3 install --user meson
 
     - name: Installing GTKmm dependencies
-      run: sudo apt-get install -y libgtk-4-dev libglibmm-2.4-dev libsigc++-2.0-dev libcairomm-1.1-dev libpangomm-2.2-dev
+      run: |
+        sudo apt install build-essential git g++ autotools-dev libgtkmm-3.0-dev \
+         libgtkmm-3.0-doc mm-common libgtk-4-bin \
+         libgtk-4-common libgtk-4-dev libgtk-4-doc pkg-config
+
+        wget ftp://ftp.acc.umu.se/pub/gnome/sources/libsigc++/3.0/libsigc++-3.0.7.tar.xz
+        tar xf libsigc++-3.0.7.tar.xz
+        cd libsigc++-3.0.7
+        meson --libdir lib my_build .
+        cd my_build
+        ninja
+        ninja install
+        cd ../..
+
+        https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.2.tar.xz
+        tar xf glibmm-2.68.2
+        meson --libdir lib my_build .
+        cd my_build
+        ninja
+        ninja install
+        cd ../..
+
+        git clone https://github.com/freedesktop/cairomm
+        cd cairomm
+        meson --libdir lib my_build .
+        cd my_build
+        ninja
+        ninja install
+        cd ../..
+
+        wget https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz
+        tar xf pangomm-2.50.0/
+        cd pangomm-2.50.o/
+        meson --libdir lib my_build .
+        cd my_build
+        ninja
+        ninja install
+        cd ../..
     
     - name: Setting up GTKmm
       run: |
