@@ -19,8 +19,8 @@ jobs:
     - name: Installing Meson and Ninja
       run: sudo apt update && sudo apt install -y python3-pip ninja-build && pip3 install --user meson
 
-    - name: Installing GTKmm dependencies
-      run: sudo apt install -y sigc++-3.0 gtk4 glibmm-2.68 cairomm-1.16 pangomm-2.48 pkg-config glib-2.0 pango cairo gdk-pixbuf-2.0 graphene-1.0 build-essential
+        #- name: Installing GTKmm dependencies
+        #run: sudo apt-get install -y sigc++-3.0 gtk4 glibmm-2.68 cairomm-1.16 pangomm-2.48 pkg-config glib-2.0 pango cairo gdk-pixbuf-2.0 graphene-1.0 build-essential
     
     - name: Setting up GTKmm
       run: |
