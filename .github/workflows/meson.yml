@@ -19,8 +19,8 @@ jobs:
     - name: Installing Meson and Ninja
       run: sudo apt update && sudo apt install -y python3-pip ninja-build && pip3 install --user meson
 
-        - name: Installing GTKmm dependencies
-        run: sudo apt-get install -y libxkbcommon-dev
+    - name: Installing GTKmm dependencies
+      run: sudo apt-get install -y libxkbcommon-dev
     
     - name: Setting up GTKmm
       run: |
