@@ -41,6 +41,7 @@ jobs:
         ninja
         sudo ninja install
         cd ../..
+        pkg-config --modversion glibmm-2.68
 
         wget https://www.cairographics.org/releases/cairomm-1.16.2.tar.xz
         tar xf cairomm-1.16.2.tar.xz
