@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Installing Meson and Ninja
-      run: sudo apt update && sudo apt install -y python3-pip ninja-build && pip3 install --user meson
+      run: sudo apt update && sudo apt install -y python3-pip ninja-build && sudo pip3 install meson
 
     - name: Installing GTKmm dependencies
       run: |
