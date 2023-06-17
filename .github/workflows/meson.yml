@@ -53,9 +53,9 @@ jobs:
         sudo ninja install
         cd ../..
 
-        wget https://download.gnome.org/sources/pangomm/2.48/pangomm-2.48.0.tar.xz
-        tar xf pangomm-2.48.0.tar.xz
-        cd pangomm-2.48.0/
+        wget https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz
+        tar xf pangomm-2.50.0.tar.xz
+        cd pangomm-2.50.0/
         meson --libdir lib --prefix=/usr my_build .
         cd my_build
         ninja
