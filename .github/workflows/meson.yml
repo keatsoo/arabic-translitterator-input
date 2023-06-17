@@ -34,7 +34,7 @@ jobs:
         sudo ninja install
         cd ../..
 
-        https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.0.tar.xz
+        wget https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.0.tar.xz
         tar xf glibmm-2.68.0
         meson --libdir lib my_build .
         cd my_build
