@@ -24,7 +24,9 @@ jobs:
         sudo apt install build-essential git g++ libgtkmm-3.0-dev \
          mm-common libgtk-4-bin \
          libgtk-4-common libgtk-4-dev pkg-config \
-         python3-jinja2 python3-markdown python3-markupsafe python3-pygments python3-typogrify
+         python3-jinja2 python3-markdown python3-markupsafe python3-pygments python3-typogrify python3-docutils
+
+        pip install --upgrade tomli
 
         wget ftp://ftp.acc.umu.se/pub/gnome/sources/libsigc++/3.0/libsigc++-3.0.7.tar.xz
         tar xf libsigc++-3.0.7.tar.xz
