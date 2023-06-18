@@ -24,7 +24,8 @@ jobs:
         sudo apt install build-essential git g++ libgtkmm-3.0-dev \
          mm-common libgtk-4-bin \
          libgtk-4-common libgtk-4-dev pkg-config \
-         python3-jinja2 python3-markdown python3-markupsafe python3-pygments python3-typogrify python3-docutils
+         python3-jinja2 python3-markdown python3-markupsafe python3-pygments python3-typogrify python3-docutils\
+         libgstreamer-plugins-base1.0-dev
 
         pip install --upgrade tomli
 
